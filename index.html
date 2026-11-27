@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>David's Christmas List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: warm, festive, family group-chat energy
+IDEA: a stack of wrapped presents with gift tags; each wish is a tag you can "take"
+PICTURE: hand-drawn SVG present stack in the hero; the list itself below
+COLOUR and TYPE: deep pine green ground, white tags, holly red accent, a touch of gold; DM Serif Display + Nunito
+LAYOUT: hero band (title + presents), then one column of gift tags, sign-up card first for new people
+*/
+:root{color-scheme:light dark;
+--bg:light-dark(#0f3b2c,#081f17);--band:light-dark(#145039,#0c2b20);
+--card:light-dark(#ffffff,#13271f);--ink:light-dark(#16251f,#eef3ef);--soft:light-dark(#5b6b64,#9fb3aa);
+--line:light-dark(#e4ebe7,#24402f);--red:#d0263a;--red2:light-dark(#a81b2c,#ff5a6c);--gold:#e8b64c;--on:#fff}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Nunito,system-ui,sans-serif;overflow-x:clip}
+h1,h2{font-family:"DM Serif Display",Georgia,serif;font-weight:400;line-height:1.05;text-wrap:balance;margin:0}
+.hero{background:var(--band);color:#fff;padding:clamp(24px,4vw,48px) max(5vw,16px) 0;position:relative;overflow:hidden}
+.hero-in{max-width:980px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:end}
+.hero h1{font-size:clamp(36px,6vw,56px)}
+.hero p{color:#cfe3d8;max-width:40ch;margin:12px 0 28px}
+.hero svg{width:100%;height:auto;display:block}
+.snow{position:absolute;inset:0;pointer-events:none}
+main{max-width:980px;margin:0 auto;padding:28px max(5vw,16px) 64px}
+.card{background:var(--card);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+label{font-weight:700;font-size:14px;display:block;margin-bottom:6px}
+input,textarea{width:100%;font:16px Nunito,sans-serif;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:transparent;color:var(--ink)}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+button,.btn{font:800 15px Nunito,sans-serif;min-height:44px;padding:10px 18px;border-radius:999px;border:0;cursor:pointer;background:var(--red);color:var(--on);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+button.ghost,.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+button:disabled{opacity:.5;cursor:default}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:#e6f0ea;margin:8px 0 18px}
+.bar h2{font-size:32px;color:#fff}
+.pill{background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:18px}
+.tag{position:relative;background:var(--card);border-radius:16px;padding:22px 20px 18px 20px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 22px rgba(0,0,0,.2)}
+.tag::before{content:"";position:absolute;top:16px;right:18px;width:14px;height:14px;border-radius:50%;border:3px solid var(--gold);background:var(--bg)}
+.tag h3{margin:0;font-size:19px;line-height:1.25;padding-right:28px}
+.meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:var(--soft);font-size:14px}
+.price{font-weight:800;color:var(--ink);white-space:nowrap}
+.top{background:var(--gold);color:#3a2a00;font-weight:800;font-size:13px;border-radius:999px;padding:2px 10px}
+.note{color:var(--soft);font-size:15px;margin:0}
+.acts{margin-top:auto;display:flex;gap:10px;flex-wrap:wrap;padding-top:6px}
+.acts a{color:var(--red2);font-weight:800}
+.tag.got{opacity:.72}
+.tag.got h3{text-decoration:line-through;text-decoration-color:var(--red)}
+.got-by{background:light-dark(#fdecee,#3a1419);color:var(--red2);border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px}
+.empty{color:#d7e6de;text-align:center;padding:40px 10px}
+.hint{font-size:14px;color:var(--soft);margin:10px 0 0}
+.msg{display:none;margin-top:12px;font-weight:700;color:var(--red2)}
+dialog{border:0;border-radius:20px;padding:0;max-width:min(520px,92vw);width:100%;background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(3,20,14,.6)}
+.dlg{padding:24px}
+.dlg h2{font-size:30px;margin-bottom:10px}
+.bubble{background:light-dark(#e9f6ee,#173126);border-radius:16px 16px 16px 4px;padding:14px 16px;font-weight:700;margin:14px 0}
+.who{font-size:14px;color:var(--soft)}
+.owner-form{margin-bottom:26px}
+.owner-form h2{font-size:28px;margin-bottom:14px}
+.secret{background:rgba(232,182,76,.15);color:#f6dfa6;border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:16px}
+@media(max-width:600px){.hero-in{grid-template-columns:1fr}.hero svg{max-width:340px;margin:0 auto}.grid2{grid-template-columns:1fr}.hero p{margin-bottom:8px}}
+@media(prefers-reduced-motion:reduce){.flake{animation:none!important}}
+@keyframes fall{to{transform:translateY(420px)}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <svg class="snow" aria-hidden="true" id="snow"></svg>
+  <div class="hero-in">
+    <div>
+      <h1>David's Christmas list</h1>
+      <p id="sub">Pick a gift, mark it bought, and the rest of the family gets a heads-up so nobody doubles up. David never sees who got what.</p>
+    </div>
+    <svg viewBox="0 0 360 230" role="img" aria-label="A stack of wrapped presents">
+      <defs>
+        <linearGradient id="gR" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e0354a"/><stop offset="1" stop-color="#a51a2b"/></linearGradient>
+        <linearGradient id="gW" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e6df"/></linearGradient>
+        <linearGradient id="gG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f1c766"/><stop offset="1" stop-color="#c8952e"/></linearGradient>
+      </defs>
+      <ellipse cx="185" cy="226" rx="170" ry="9" fill="#000" opacity=".25"/>
+      <!-- big red box -->
+      <rect x="40" y="120" width="150" height="104" rx="6" fill="url(#gR)"/>
+      <rect x="40" y="108" width="158" height="22" rx="5" fill="#c22437" transform="translate(-4 0)"/>
+      <rect x="104" y="108" width="22" height="116" fill="url(#gG)"/>
+      <path d="M115 108c-30-30-52-8-38 2 10 7 30 2 38-2zm0 0c30-30 52-8 38 2-10 7-30 2-38-2z" fill="url(#gG)"/>
+      <!-- white box -->
+      <rect x="200" y="150" width="120" height="74" rx="6" fill="url(#gW)"/>
+      <rect x="196" y="140" width="128" height="18" rx="5" fill="#eef4f0"/>
+      <rect x="250" y="140" width="18" height="84" fill="#d0263a"/>
+      <path d="M259 140c-24-22-42-6-30 2 8 5 24 1 30-2zm0 0c24-22 42-6 30 2-8 5-24 1-30-2z" fill="#d0263a"/>
+      <!-- small gold box on top -->
+      <rect x="70" y="58" width="86" height="50" rx="5" fill="url(#gG)"/>
+      <rect x="66" y="50" width="94" height="14" rx="4" fill="#f4d27e"/>
+      <rect x="106" y="50" width="14" height="58" fill="#0f6b48"/>
+      <path d="M113 50c-18-18-32-5-23 1 6 4 18 1 23-1zm0 0c18-18 32-5 23 1-6 4-18 1-23-1z" fill="#0f6b48"/>
+      <!-- tag -->
+      <g transform="rotate(-12 300 110)">
+        <path d="M262 92h62l12 18-12 18h-62z" fill="#fff"/>
+        <circle cx="324" cy="110" r="4" fill="#145039"/>
+        <text x="270" y="116" font-family="DM Serif Display,serif" font-size="17" fill="#145039">for David</text>
+      </g>
+      <path d="M328 112c14 6 18 26 6 40" stroke="#e8b64c" stroke-width="2" fill="none"/>
+    </svg>
+  </div>
+</header>
+
+<main>
+  <div id="loading" class="empty">Loading the list…</div>
+  <section id="davidNote" class="secret" hidden>Hi David! This is your spoiler-free view: you see the list, but not who bought what.</section>
+  <section id="setupNote" class="card" hidden>
+    <h2 style="font-size:28px;margin-bottom:8px">Almost there</h2>
+    <p class="note">This site isn't connected to Firebase yet. Paste your Firebase settings into the <b>FIREBASE_CONFIG</b> section at the top of the script in index.html, then upload it again.</p>
+  </section>
+  <section id="join" class="card" hidden style="margin-bottom:26px">
+    <h2 style="font-size:30px;margin-bottom:6px">Join the gift group</h2>
+    <p class="note" style="margin-bottom:16px">Add your name and number once. You'll be in the group text whenever someone else buys a gift. No account needed.</p>
+    <form id="joinForm" class="grid2">
+      <div><label for="jName">Your name</label><input id="jName" autocomplete="name" maxlength="40" required placeholder="Aunt Maria"></div>
+      <div><label for="jPhone">Phone number</label><input id="jPhone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="(713) 555-0123"></div>
+      <div><button type="submit">Join the list</button></div>
+    </form>
+    <p class="msg" id="joinMsg"></p>
+  </section>
+
+  <section id="listArea" hidden>
+    <div class="bar"><h2>The wishlist</h2><span class="pill" id="count"></span></div>
+    <p id="meLine" class="hint" style="color:#cfe3d8;margin:-8px 0 16px" hidden></p>
+    <div class="list" id="list"></div>
+  </section>
+</main>
+
+<dialog id="dlg"><div class="dlg">
+  <h2>Nice, it's yours! 🎁</h2>
+  <p class="note">Send this to everyone else so nobody buys the same thing:</p>
+  <div class="bubble" id="dMsg"></div>
+  <p class="who" id="dWho"></p>
+  <div class="row" style="margin-top:14px">
+    <a class="btn" id="dSms" href="#">Text the family</a>
+    <button class="ghost" id="dCopy">Copy text</button>
+  </div>
+  <p class="hint">This opens a group text with everything filled in. Just hit send.</p>
+  <div class="row" style="margin-top:16px"><button class="ghost" id="dClose">Done</button></div>
+</div></dialog>
+
+<script type="module">
+/* =========================================================
+   1) PASTE YOUR FIREBASE SETTINGS HERE (see setup guide)
+   ========================================================= */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAt-i23_l63AuMVk3TFjpfoCtiHAdLTaLM",
+  authDomain: "davidtorreschristmaslist.firebaseapp.com",
+  projectId: "davidtorreschristmaslist",
+  storageBucket: "davidtorreschristmaslist.firebasestorage.app",
+  messagingSenderId: "650082115457",
+  appId: "1:650082115457:web:0d8199deda6cdc24f71280"
+};
+
+/* =========================================================
+   2) YOUR GIFT LIST. Edit, add or remove lines, then re-upload.
+      Keep each id unique and never reuse an old one.
+   ========================================================= */
+const GIFTS = [
+  { id:"owala", title:"Owala SmoothSip Slider Coffee Tumbler, 20 oz", note:"Stainless steel, color: Very Very Dark", url:"https://www.google.com/search?tbm=shop&q=Owala+SmoothSip+Slider+20+oz+Very+Very+Dark" },
+  { id:"petermillar", title:"Peter Millar vest, hoodie/jacket or polo", note:"Size M. Any one of these works", url:"https://www.google.com/search?tbm=shop&q=Peter+Millar+mens+vest+polo+quarter+zip" },
+  { id:"brooks", title:"Brooks Brothers vest, hoodie/jacket or polo", note:"Size M. Any one of these works", url:"https://www.google.com/search?tbm=shop&q=Brooks+Brothers+mens+vest+polo+jacket" },
+  { id:"belt", title:"Polo Ralph Lauren Leather-Trim Suede Belt", note:"", url:"https://www.google.com/search?tbm=shop&q=Polo+Ralph+Lauren+Leather-Trim+Suede+Belt" },
+  { id:"mate", title:"REGIO Imperial Stainless Steel Mate Gourd", note:"", url:"https://www.amazon.com/s?k=REGIO+Imperial+Stainless+Steel+Mate+Gourd" },
+  { id:"valet", title:"Valet tray with built-in wireless charging pad", note:"Nightstand organizer", url:"https://www.amazon.com/s?k=valet+tray+wireless+charging+nightstand+organizer" },
+  { id:"shokz", title:"SHOKZ OpenDots 2 Open-Ear Clip-On Earbuds", note:"Black, Dolby Audio, 3 mics", url:"https://www.google.com/search?tbm=shop&q=SHOKZ+OpenDots+2+Black" },
+  { id:"prada", title:"Prada Paradigme cologne", note:"", url:"https://www.google.com/search?tbm=shop&q=Prada+Paradigme+cologne" },
+  { id:"onemillion", title:"1 Million cologne (black)", note:"", url:"https://www.google.com/search?tbm=shop&q=Paco+Rabanne+1+Million+black+cologne" },
+  { id:"walkingpad", title:"Walking pad", note:"Under-desk treadmill", url:"https://www.amazon.com/s?k=walking+pad+under+desk+treadmill" },
+  { id:"khakis", title:"Polo Ralph Lauren khaki pants", note:"Size 32x34", url:"https://www.google.com/search?tbm=shop&q=Polo+Ralph+Lauren+mens+khaki+pants" }
+];
+const WHO_FOR = "David";
+/* ========================================================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl=u=>/^https:\/\//i.test(String(u||''))?String(u):'';
+const normPhone=p=>{let d=String(p||'').replace(/\D/g,'');if(d.length===10)d='1'+d;return d.length>=11&&d.length<=15?'+'+d:''};
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isDavid=location.hash.toLowerCase()==='#'+WHO_FOR.toLowerCase();
+
+// snow
+{const sn=$('snow');let f='';for(let i=0;i<34;i++){const x=Math.random()*100,r=1+Math.random()*2.4,d=6+Math.random()*9,dl=-Math.random()*15;f+=`<circle class="flake" cx="${x}%" cy="-10" r="${r}" fill="#fff" opacity="${.35+Math.random()*.5}" style="animation:fall ${d}s linear ${dl}s infinite"/>`}sn.innerHTML=f;}
+
+let me=null,members={},claims={},ready=false,lastMsg='';
+
+function render(){
+  $('loading').hidden=true;
+  const joined=isDavid||!!members[me];
+  $('join').hidden=joined;
+  $('davidNote').hidden=!isDavid;
+  $('listArea').hidden=false;
+  if(!isDavid&&members[me]){$('meLine').hidden=false;$('meLine').textContent=`You're in as ${members[me].name}.`}
+  const left=GIFTS.filter(g=>!claims[g.id]).length;
+  $('count').textContent=isDavid?`${GIFTS.length} gifts`:`${left} of ${GIFTS.length} still up for grabs`;
+  const list=isDavid?GIFTS:[...GIFTS].sort((a,b)=>(claims[a.id]?1:0)-(claims[b.id]?1:0));
+  $('list').innerHTML=list.map(g=>{
+    const c=isDavid?null:claims[g.id],url=safeUrl(g.url),mine=c&&c.by===me;
+    let acts=url?`<a href="${esc(url)}" target="_blank" rel="noopener">View gift ↗</a>`:'';
+    if(!isDavid){
+      if(!c) acts+= joined?`<button data-claim="${esc(g.id)}">I bought this</button>`:`<button disabled>Join above to claim</button>`;
+      else if(mine) acts+=`<button class="ghost" data-text="${esc(g.id)}">Text family</button><button class="ghost" data-undo="${esc(g.id)}">Undo</button>`;
+    }
+    return `<article class="tag${c?' got':''}"><h3>${esc(g.title)}</h3>
+      ${g.note?`<p class="note">${esc(g.note)}</p>`:''}
+      ${c?`<div class="got-by">${mine?'You bought this':esc(c.name||'Someone')+' got this one'}</div>`:''}
+      <div class="acts">${acts}</div></article>`}).join('');
+}
+
+function openText(gid){
+  const g=GIFTS.find(x=>x.id===gid);if(!g)return;
+  const msg=`${members[me]?.name||'Someone'} bought ${g.title} for ${WHO_FOR}`;
+  const others=Object.entries(members).filter(([id,m])=>id!==me&&m.phone).map(([,m])=>m);
+  const nums=[...new Set(others.map(m=>m.phone))].filter(n=>n!==members[me]?.phone);
+  lastMsg=msg;$('dMsg').textContent=msg;
+  $('dWho').textContent=nums.length?`Goes to: ${[...new Set(others.map(m=>m.name))].join(', ')}`:"Nobody else has joined yet, so there's no one to text.";
+  const body=encodeURIComponent(msg);
+  $('dSms').href=isIOS?`sms:/open?addresses=${nums.join(',')}&body=${body}`:`sms:${nums.join(',')}?body=${body}`;
+  $('dSms').style.display=nums.length?'':'none';
+  $('dlg').showModal();
+}
+$('dCopy').onclick=async e=>{const b=e.currentTarget;try{await navigator.clipboard.writeText(lastMsg);b.textContent='Copied!'}catch{b.textContent='Copy blocked'}setTimeout(()=>b.textContent='Copy text',1500)};
+$('dClose').onclick=()=>$('dlg').close();
+
+const configured=!Object.values(FIREBASE_CONFIG).includes("PASTE_HERE");
+if(!configured){$('loading').hidden=true;$('setupNote').hidden=false;}
+else{
+  const app=initializeApp(FIREBASE_CONFIG),auth=getAuth(app),db=getFirestore(app);
+  const t=setTimeout(()=>{if(!ready)$('loading').textContent="Can't reach the list right now. Check your connection and refresh."},10000);
+  onAuthStateChanged(auth,u=>{
+    if(!u)return;
+    if(me)return; me=u.uid;
+    if(isDavid){ready=true;clearTimeout(t);render();return}
+    let n=0;const ok=()=>{if(++n===2){ready=true;clearTimeout(t)}};
+    onSnapshot(collection(db,'members'),s=>{members={};s.forEach(d=>members[d.id]=d.data());ok();render()},e=>{$('loading').textContent="Couldn't load the list: "+e.code});
+    onSnapshot(collection(db,'claims'),s=>{claims={};s.forEach(d=>claims[d.id]=d.data());ok();render()},()=>{});
+  });
+  signInAnonymously(auth).catch(e=>{$('loading').textContent="Couldn't connect: "+e.code+". Is Anonymous sign-in turned on in Firebase?"});
+
+  $('joinForm').addEventListener('submit',async e=>{
+    e.preventDefault();const m=$('joinMsg');m.style.display='none';
+    const name=$('jName').value.trim(),phone=normPhone($('jPhone').value);
+    if(!name)return;
+    if(!phone){m.textContent='That phone number looks off. Try 10 digits, like 713 555 0123.';m.style.display='block';return}
+    try{await setDoc(doc(db,'members',me),{name,phone,joinedAt:Date.now()})}
+    catch(err){m.textContent="Couldn't join. Try again in a moment.";m.style.display='block'}
+  });
+
+  $('list').addEventListener('click',async e=>{
+    const b=e.target.closest('button');if(!b)return;
+    const {claim,undo,text}=b.dataset;
+    try{
+      if(claim){b.disabled=true;b.textContent='Saving…';
+        await setDoc(doc(db,'claims',claim),{by:me,name:members[me]?.name||'Someone',at:Date.now()});
+        openText(claim);}
+      else if(undo){await deleteDoc(doc(db,'claims',undo))}
+      else if(text){openText(text)}
+    }catch(err){b.disabled=false;b.textContent=claim?'Someone just took this':"Couldn't save"}
+  });
+}
+</script>
+</body>
+</html>
